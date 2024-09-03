@@ -30,7 +30,7 @@ order by fnev;
 select fnev as "futo", timestampdiff(year, makedate(szulev, szulho), makedate(2016, 1)) as "kor"
 from futok
 where timestampdiff(year, makedate(szulev, szulho), makedate(2016, 1)) >= 42
-order by szulev, szulho 
+order by szulev, szulho;
 
 /*
     Listázza ki a 10 legjobb köridőt futó férfi nevét és köridejét! A név mező címkéje „futo”
@@ -42,7 +42,7 @@ from futok
 inner join eredmenyek 
 on futok.fid = eredmenyek.futo
 order by ido 
-limit 10
+limit 10;
 
 /*
     Listázza ki csapatonként a csapattagok összesített köridejét! A mezők címkéi „csapat” és
@@ -53,7 +53,7 @@ select csapat, sum(ido) as "csapatido" from eredmenyek
 inner join futok
 on futok.fid = eredmenyek.futo
 group by csapat
-order by sum(ido)
+order by sum(ido);
 
 /*************************************************************************************************/
 
@@ -71,4 +71,47 @@ order by nev;
 */
 
 select distinct versenyzo from eredmenyek 
-where ures > 0
+where ures > 0;
+
+/*
+    Listázza ki minden versenyzőre az átlagos tarolási pontértékét! A versenyzők neve mellett
+    a számított mező címkéje „atlagpont” legyen! A listát rendezze a számított mező szerint
+    csökkenő rendbe!
+*/
+
+select nev, AVG(tarolas) as "atlagpont"
+from versenyzok
+inner join eredmenyek 
+on versenyzok.rajtszam = eredmenyek.versenyzo
+group by versenyzok.rajtszam
+order by AVG(tarolas) DESC;
+
+/*
+    Listázza ki a legtöbb versenyzőt adó egyesület nevét!
+*/
+
+select egyesuletek.nev, count(egyesuletek.id)
+from egyesuletek
+inner join versenyzok
+on versenyzok.egyid = egyesuletek.id
+group by egyesuletek.id
+order by count(egyesuletek.id) desc
+limit 1;
+
+/*
+    Listázza ki a B korcsoport egyéni eredményhirdető táblázatát! A mezők címkéi
+    „nev”, „eredmeny”, „tarolas” és „ures” legyen! Az „eredmeny” mezőben a telitalálatok
+    összesített pontjának és a tarolások összesített pontjának összegét kell megjeleníteni, míg a
+    másik kettőben a névazonos mezők összesítését! A tornán a helyezéseket az alábbiak szerint
+    kell eldönteni: összesített eredmények egyenlősége esetén a magasabb tarolási pontszám
+    számít, ha pedig ezek is egyenlők, akkor a minél kevesebb üres gurítás! A listát rendezze
+    úgy, hogy a legjobb eredményt elérő versenyző nevével kezdődjön!
+*/
+
+select nev, sum(teli + tarolas) as "eredmények", tarolas, count(ures = 1) as "üresek"
+from eredmenyek
+inner join versenyzok
+on versenyzok.rajtszam = eredmenyek.versenyzo
+where versenyzok.korcsop = "B"
+group by versenyzok.rajtszam 
+order by sum(teli + tarolas) desc, tarolas desc, count(ures = 1); 
