@@ -115,3 +115,24 @@ on versenyzok.rajtszam = eredmenyek.versenyzo
 where versenyzok.korcsop = "B"
 group by versenyzok.rajtszam 
 order by sum(teli + tarolas) desc, tarolas desc, count(ures = 1); 
+
+
+select nev from versenyzo
+order by eletkor desc
+
+select count(*) as "palyak szama" from palya
+
+select csapat.nev, versenyzo.nev as "versenyzo" 
+from csapat 
+inner join versenyzo 
+on versenyzo.csapatid = csapat.id
+order by versenyzo.nev
+
+select palya.nev as "pályanév", versenyzo.nev as "pályanév", korido.korido as "köridő"
+from korido
+inner join palya 
+on korido.palyaid = palya.id
+inner join versenyzo 
+on korido.versenyzoid = versenyzo.id
+where palya.orszag = "olaszország"
+and korido.kor = 1
